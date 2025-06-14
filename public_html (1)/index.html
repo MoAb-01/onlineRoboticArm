@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Tech Titans</title>
+
+</head>
+<body>
+    <header>
+        <div class="navbar">
+
+         <div class="logo">
+            <a href="#" target="_blank" rel="noopener noreferrer">
+                    <img src="logo.jpeg" alt="" id="img">
+            </a>
+
+         </div>
+         
+         <ul>
+             <li><div class="BarElements">Home </div></li>
+             <!-- <li><div class="BarElements">Manual</div></li> -->
+             <!-- <li><div class="BarElements">Theme</div></li> -->
+         </ul>
+
+        </div>
+   </header>
+
+
+
+
+        <div class="container">
+            
+           <div class="blubtn" onclick="connect()">connect to bluetooth</div>
+           
+
+            <div class="select-box">
+                
+                <h2>Select language</h2>
+
+
+               
+
+                <div class="options-container">
+                    <div class="option">
+                        <input type="radio" class="radio" name="arabic" id="arabic">
+                        <label for="arabic">Arabic</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" class="radio" name="english" id="english">
+                        <label for="english">English</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" class="radio" name="spanish" id="spanish">
+                        <label for="spanish">Spanish</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" class="radio" name="Turkish" id="Turkish">
+                        <label for="Turkish">Turkish</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" class="radio" name="french" id="french">
+                        <label for="french">French</label>
+                    </div>
+                    <!-- <div class="option">
+                        <input type="radio" class="radio" name="chinese" id="chinese">
+                        <label for="chinese">Chinese</label>
+                    </div> -->
+                    <div class="option">
+                        <input type="radio" class="radio" name="german" id="german">
+                        <label for="german">German</label>
+                    </div>
+
+
+                </div>
+
+                <div class="selected">
+                    select language
+                </div> 
+
+            </div>
+
+                <div class="inputIcon" onclick="ToggleMic()">
+                    <img src="microphoneIcon.png" alt="" id="mic">
+                </div>
+
+
+
+                    <h1 id="transcript"></h1>
+                
+
+               
+
+                
+        </div>
+
+<script src="script.js"></script>
+<!-- <script src="main.js"></script> -->
+ 
+</body>
+</html>

@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const fetch = require("node-fetch");
+const https = require('https');
 
 const app = express();
 const PORT = 3000;
@@ -77,44 +77,96 @@ Extrae la intención y asígnala a uno de los comandos permitidos anteriores, de
 app.post("/lemur", async (req, res) => {
   const { input_text, language } = req.body;
 
-  const prompt = lemurPrompts[language] || lemurPrompts["English"]; // fallback to English if unknown
+  if (!input_text) {
+    console.error("No input text provided");
+    return res.status(400).json({ error: "No input text provided" });
+  }
+
+  console.log("Received request:", { input_text, language });
+
+  const prompt = lemurPrompts[language] || lemurPrompts["English"];
 
   try {
-    const start = await fetch("https://api.assemblyai.com/lemur/v3/generate/task", {
-      method: "POST",
-      headers: {
-        authorization: assemblyAIKey,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        final_model: "anthropic/claude-3-7-sonnet-20250219",
-        prompt: prompt,
-        input_text: input_text
-      }),
+    console.log("Making request to AssemblyAI...");
+    
+    const postData = JSON.stringify({
+      final_model: "anthropic/claude-3-sonnet",
+      questions: [{
+        question: prompt,
+        answer_options: ["open", "close", "peace", "ok", "bad", "unknown"]
+      }],
+      input_text: input_text,
+      max_output_size: 100,
+      temperature: 0.1
     });
 
-    const { id } = await start.json();
+    const options = {
+      hostname: 'api.assemblyai.com',
+      path: '/lemur/v3/generate/question-answer',
+      method: 'POST',
+      headers: {
+        'Authorization': assemblyAIKey,
+        'Content-Type': 'application/json',
+        'Content-Length': postData.length
+      }
+    };
 
-    let result;
-    do {
-      await new Promise(r => setTimeout(r, 500));
-      const poll = await fetch(
-        `https://api.assemblyai.com/lemur/v3/generate/task/${id}/response`,
-        { headers: { authorization: assemblyAIKey } }
-      );
-      result = await poll.json();
-    } while (result.status !== "completed" && result.status !== "error");
+    console.log("Request options:", {
+      hostname: options.hostname,
+      path: options.path,
+      method: options.method,
+      headers: {
+        ...options.headers,
+        'Authorization': '***' // Hide the key in logs
+      }
+    });
 
-    if (result.status === "error") {
-      console.error("LeMUR error:", result);
-      return res.status(500).json({ error: result.error });
+    console.log("Request body:", postData);
+
+    const startRequest = new Promise((resolve, reject) => {
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            if (res.statusCode !== 200) {
+              console.error("API Error Response:", data);
+              reject(new Error(`API responded with status ${res.statusCode}: ${data}`));
+              return;
+            }
+            resolve(JSON.parse(data));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        console.error("Request error:", error);
+        reject(error);
+      });
+
+      req.write(postData);
+      req.end();
+    });
+
+    const result = await startRequest;
+    console.log("AssemblyAI response:", result);
+
+    if (!result.response || !result.response[0] || !result.response[0].answer) {
+      throw new Error("Invalid response format from API");
     }
 
-    return res.json({ result: result.response });
+    return res.json({ result: result.response[0].answer.trim().toLowerCase() });
 
   } catch (err) {
     console.error("Error calling LeMUR:", err);
-    return res.status(500).json({ error: "Server error calling LeMUR" });
+    return res.status(500).json({ 
+      error: "Server error calling LeMUR",
+      details: err.message 
+    });
   }
 });
 

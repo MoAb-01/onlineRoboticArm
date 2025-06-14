@@ -119,26 +119,16 @@ function SetupStream(stream) {
     const transcriptionText = await transcribeAudio(blob);
     RecordedAudioBlobs = [];
 
-    if (chosenLanguage == "English") {
-      console.log(`original text: ${transcriptionText}`);
+    console.log(`original text: ${transcriptionText}`);
 
-      const lemurCommand = await getLemurCommand(transcriptionText);
-      console.log(`Lemur Command: ${lemurCommand}`);
+    const lemurCommand = await getLemurCommand(transcriptionText);
+    console.log(`Lemur Command: ${lemurCommand}`);
 
-      myElement.innerText = lemurCommand;
+    myElement.innerText = lemurCommand;
 
-      var enc = new TextEncoder();
-
-      await characteristic.writeValue(enc.encode(lemurCommand));
-      console.log(`bluetooth data sent: ${lemurCommand}`);
-    }
-    else {
-      console.log(`original text: ${transcriptionText}`);
-      myElement.innerText = transcriptionText;
-      var enc = new TextEncoder();
-      await characteristic.writeValue(enc.encode(transcriptionText));
-      console.log(`bluetooth data sent: ${transcriptionText}`);
-    }
+    var enc = new TextEncoder();
+    await characteristic.writeValue(enc.encode(lemurCommand));
+    console.log(`bluetooth data sent: ${lemurCommand}`);
   }
   canRecord = true;
   isRecording = !canRecord;
@@ -323,7 +313,7 @@ function arabic() {
 //__23__23__23__23_23
 
 
-const assemblyAIKey = "4a687589c4b44casdasdasdasdas5dba72c41b3cbe712f";
+const assemblyAIKey = "4a687589c4b44c5dba72c41b3cbe712f";
 const lemurPrompt =
   `
 You are controlling a multilingual prosthetic hand.
